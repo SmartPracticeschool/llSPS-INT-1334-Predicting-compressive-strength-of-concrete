@@ -1,0 +1,42 @@
+import pandas as pd
+import numpy as np
+
+dataset=pd.read_excel(r"/content/Concrete_Data (1).xlsx")
+
+req_col_names = ["Cement", "BlastFurnaceSlag", "FlyAsh", "Water", "Superplasticizer",
+                 "CoarseAggregate", "FineAggregare", "Age", "CC_Strength"]
+curr_col_names = list(dataset.columns)
+
+mapper = {}
+for i, name in enumerate(curr_col_names):
+    mapper[name] = req_col_names[i]
+
+dataset = dataset.rename(columns=mapper)
+len(dataset)
+dataset 
+dataset.describe()
+
+dataset.isnull().any()
+
+x=dataset.iloc[:,0:8].values
+y=dataset.iloc [:,8:9].values
+
+from sklearn.preprocessing import StandardScaler
+sc=StandardScaler()
+x=sc.fit_transform(x)
+y=sc.fit_transform(y)
+
+from sklearn.model_selection import train_test_split
+x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=0.2,random_state=0)
+  
+from sklearn.ensemble import RandomForestRegressor
+reg = RandomForestRegressor(n_estimators=100)
+reg.fit(x_train, y_train)
+ypred1= reg.predict(x_test)
+
+import pickle
+pickle.dump(reg,open("Strenght.pkl",'wb'))
+
+from sklearn.metrics import r2_score 
+accuracy = r2_score(y_test,ypred1)
+accuracy
